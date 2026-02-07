@@ -1,0 +1,4 @@
+artifacts/
+.deps/
+node_modules/
+coverage/
