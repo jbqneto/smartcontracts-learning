@@ -29,7 +29,7 @@ contract PublicVoting {
     }
 
     function addVoting(string memory title, string[] memory options, uint timeToVote) public payable {
-        require(msg.value > CREATE_VOTING_FEE, "Insufficient creation fee");
+        require(msg.value >= CREATE_VOTING_FEE, "Insufficient creation fee");
         require(options.length > 1, "Required at least 2 options");
         require(options.length < 6, "Required at maximum 6 options");
         require(bytes(title).length > 5, "Title too short");
@@ -72,13 +72,18 @@ contract PublicVoting {
         return votings[id];
     }
 
+    function totalVotings() public view returns(uint) {
+        return votings.length;
+    }
+
     function withdraw() public {
         require(msg.sender == owner, "Only owner can withdraw funds.");
 
         uint256 balance = address(this).balance;
         require(balance > 0, "No funds to withdraw");
 
-        payable(owner).transfer(balance);
+        (bool success, ) = payable(owner).call{value: balance}("");
+        require(success, "Transfer failed");
 
     }
 
